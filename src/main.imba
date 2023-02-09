@@ -1,7 +1,10 @@
-def load url
-	var res = await window.fetch url
-	return res.json()
-let posts = await load "./assets/data.json"
+import {data} from "./data.imba"
+
+# def load url
+# 	var res = await window.fetch url
+# 	return res.json()
+# let posts = await load "./data/data.json"
+let posts = data
 
 tag paper-item
 	paper
