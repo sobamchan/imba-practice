@@ -1,7 +1,7 @@
 def load url
 	var res = await window.fetch url
 	return res.json()
-let posts = await load "./data/data.json"
+let posts = await load "./assets/data.json"
 
 tag paper-item
 	paper
