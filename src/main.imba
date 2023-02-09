@@ -1,10 +1,10 @@
-import {data} from "./data.imba"
+def load url
+	var res = await window.fetch url
+	return res.json()
+let posts = await load "/imba-practice/data.json"
 
-# def load url
-# 	var res = await window.fetch url
-# 	return res.json()
-# let posts = await load "./data/data.json"
-let posts = data
+# import {data} from "./data.imba"
+# let posts = data
 
 tag paper-item
 	paper
