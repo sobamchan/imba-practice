@@ -6,5 +6,4 @@ export default defineConfig({
 	base: '/imba-practice/',
 	plugins: [imba()],
 	build: { target: 'esnext' },
-	// assetsInclude: ['./data/data.json'],
 });
