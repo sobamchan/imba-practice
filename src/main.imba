@@ -114,6 +114,9 @@ tag app
 
 	def render
 		<self>
+			<h1> "Read everything in EMNLP 2022 main track"
+			<div[mt:8px mb:8px]> "Hit 'Fav' to keep, 'checked' to remove from the list."
+			<div[mt:8px mb:8px]> "Enter keywords for filtering."
 			<search-box @handleSubmit=handleSubmit>
 			<selected-papers-list selectedPapers=selectedPapers @removeClickHandler=removeClickHandler @clearSelectedPapers=clearSelectedPapers>
 			<paper-list papers=filteredPapers @handleSelect=handleSelect @handleChecked=handleChecked selectedPapers=selectedPapers>
