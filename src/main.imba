@@ -22,7 +22,9 @@ tag paper-item
 			<div.paperItem>
 				<button [mr:8px] @click=emit("handleSelect", paper) disabled=(paper in selectedPapers)>
 					"Fav"
-				<a href=paper.url>
+				<button [mr:8px] @click=emit("handleChecked", paper)>
+					"Checked"
+				<a href=paper.url target="_blank">
 					paper.title
 				<div>
 					for author in paper.authors
@@ -39,6 +41,7 @@ tag paper-list
 	papers
 	selectedPapers
 	<self>
+		<span[ml:4px]> "{papers.length} papers to go"
 		for paper in papers
 			<paper-item paper=paper selectedPapers=selectedPapers>
 
@@ -59,18 +62,21 @@ tag selected-papers-list
 
 	<self>
 		<button @click=toggleList> "Toggle"
+		<span[ml:4px]> "({selectedPapers.length} papers selected now)"
 		<div.selectedList .show=showList>
 			<button @click=emit("clearSelectedPapers")> "Clear List"
 			<div>
 				for sp in selectedPapers
 					<div>
 						<button @click=emit("removeClickHandler", sp)> "Remove"
-						sp.title
+						<a href=sp.url target="_blank">
+							sp.title
 
 tag app
 	prop papers = posts
 	prop filteredPapers = posts
 	prop selectedPapers = []
+	prop checkedPapers = []
 
 	def handleSubmit e
 		const query = e.detail
@@ -80,21 +86,36 @@ tag app
 	def handleSelect e
 		const paper = e.detail
 		selectedPapers.push(paper) unless paper in selectedPapers
+		
+		newFilteredPapers = []
+		for fp in filteredPapers
+			newFilteredPapers.push(fp) unless fp.title === paper.title
+		filteredPapers = newFilteredPapers
 
 	def clearSelectedPapers
+		filteredPapers = selectedPapers.concat(filteredPapers)
 		selectedPapers = []
 
 	def removeClickHandler e
 		const paperToRemove = e.detail
+		filteredPapers = [e.detail].concat(filteredPapers)
 		newSelectedPapers = []
 		for sp in selectedPapers
 			newSelectedPapers.push(sp) unless sp.title === paperToRemove.title
 		selectedPapers = newSelectedPapers
 
+	def handleChecked e
+		const paperTobeChecked = e.detail
+		checkedPapers.push(paperTobeChecked)
+		newFilteredPapers = []
+		for fp in filteredPapers
+			newFilteredPapers.push(fp) unless fp.title === paperTobeChecked.title
+		filteredPapers = newFilteredPapers
+
 	def render
 		<self>
 			<search-box @handleSubmit=handleSubmit>
 			<selected-papers-list selectedPapers=selectedPapers @removeClickHandler=removeClickHandler @clearSelectedPapers=clearSelectedPapers>
-			<paper-list papers=filteredPapers @handleSelect=handleSelect selectedPapers=selectedPapers>
+			<paper-list papers=filteredPapers @handleSelect=handleSelect @handleChecked=handleChecked selectedPapers=selectedPapers>
 
 imba.mount <app>
