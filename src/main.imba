@@ -13,17 +13,18 @@ global css
 tag paper-item
 	paper
 	selectedPapers
+	isFirst
 
 	css .paperItem d:block m:10px bgc:gray1
 		.tldr d:block m:4px bgc:gray2
 
 	def render
 		<self>
-			<div.paperItem>
+			<div.paperItem [bgc:red2 bd:solid bc:red9 mb:32px]=isFirst>
 				<button [mr:8px] @click=emit("handleSelect", paper) disabled=(paper in selectedPapers)>
-					"Fav"
+					if isFirst then "Fav (←)" else "Fav"
 				<button [mr:8px] @click=emit("handleChecked", paper)>
-					"Checked"
+					if isFirst then "Check (→)" else "Check"
 				<a href=paper.url target="_blank">
 					paper.title
 				<div>
@@ -41,9 +42,9 @@ tag paper-list
 	papers
 	selectedPapers
 	<self>
-		<span[ml:4px]> "{papers.length} papers to go"
-		for paper in papers
-			<paper-item paper=paper selectedPapers=selectedPapers>
+		<span[m:8px]> "{papers.length} papers to go"
+		for paper, i in papers
+			<paper-item paper=paper selectedPapers=selectedPapers isFirst=i===0>
 
 tag search-box
 	prop query = ""
@@ -112,6 +113,16 @@ tag app
 			newFilteredPapers.push(fp) unless fp.title === paperTobeChecked.title
 		filteredPapers = newFilteredPapers
 
+	def handleLeft
+		# Fav a paper on the top of the list
+		const paperToBeSelected = filteredPapers.shift()
+		selectedPapers.push(paperToBeSelected)
+
+	def handleRight
+		# Check a paper on the top of the list
+		const paperToBeChecked = filteredPapers.shift()
+		checkedPapers.push(paperToBeChecked)
+
 	def render
 		<self>
 			<h1> "Read everything in EMNLP 2022 main track"
@@ -119,6 +130,26 @@ tag app
 			<div[mt:8px mb:8px]> "Enter keywords for filtering."
 			<search-box @handleSubmit=handleSubmit>
 			<selected-papers-list selectedPapers=selectedPapers @removeClickHandler=removeClickHandler @clearSelectedPapers=clearSelectedPapers>
-			<paper-list papers=filteredPapers @handleSelect=handleSelect @handleChecked=handleChecked selectedPapers=selectedPapers>
+			<paper-list
+				papers=filteredPapers
+				@handleSelect=handleSelect
+				@handleChecked=handleChecked
+				@hotkey('left')=handleLeft
+				@hotkey('right')=handleRight
+				selectedPapers=selectedPapers
+			>
 
 imba.mount <app>
+
+
+# TODO
+# - keyword filter -> 表示されている論文をまとめて、追加 or 削除
+# - storage 使って、selected, removed を管理
+# - 見た目の改善
+# - 最後に追加した論文を markdown 形式で出力、コピペできる形式で表示するだけでもいいかも、ダウンロードが簡単じゃなければ
+# - 学会を消化する方法、としてこのツールを紹介するブログポストを書く
+# - 追加時にメモ取れるようにしておいて、最後の出力する時に一緒につけて markdown に入れてあげる
+# - 著者絞り込み 予測検索表示
+# - checkedPaper のリストも表示して、復帰できるようにする。
+
+# - DONE 表示されているリストの一番上の論文に対してのアクションを実行するショートカットキー
